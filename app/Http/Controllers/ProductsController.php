@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\WeatherCondition;
+use App\Product;
 use Illuminate\Http\Request;
 
 class ProductsController extends Controller
@@ -11,7 +12,7 @@ class ProductsController extends Controller
         $rUrl = 'https://api.meteo.lt/v1/places/'. $city .'/forecasts/long-term';
 
         if (!$data = json_decode(@file_get_contents($rUrl), true)) {
-            $data = json_decode('{"Error": "Wrong Input"}', true);
+            $data = ['input' => $city,'error' => "Wrong Input" ];
             return $data;
         } else {
             $data = json_decode(file_get_contents($rUrl), true);
@@ -26,7 +27,8 @@ class ProductsController extends Controller
             }
         }
 
-        $products = [];
+        $conditionId = WeatherCondition::where('name', $forecastAtExactHour['conditionCode'])->first();
+        $products = Product::select('sku', 'name', 'price')->whereJsonContains('weather_conditions', $conditionId->id)->get();
 
         $returnData = [
             'city' => $data['place']['name'],
