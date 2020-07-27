@@ -10,7 +10,10 @@ class ProductsController extends Controller
     function getRecommended($city){
 
         $rUrl = 'https://api.meteo.lt/v1/places/'. $city .'/forecasts/long-term';
+        $currentTime = (date('i') > 30) ? date("Y-m-d H:00:00") : date('Y-m-d H:00:00', strtotime('1 hour'));
+        $forecastAtExactHour = null;
 
+        //reading api
         if (!$data = json_decode(@file_get_contents($rUrl), true)) {
             $data = ['input' => $city,'error' => "Wrong Input" ];
             return $data;
@@ -18,8 +21,7 @@ class ProductsController extends Controller
             $data = json_decode(file_get_contents($rUrl), true);
         }
 
-        $currentTime = (date('i') > 30) ? date("Y-m-d H:00:00") : date('Y-m-d H:00:00', strtotime('1 hour'));
-        $forecastAtExactHour = null;
+        //finds the current time forecast
         foreach($data['forecastTimestamps'] as $forecast) {
             if ($currentTime == $forecast['forecastTimeUtc']) {
                 $forecastAtExactHour = $forecast;
@@ -27,8 +29,10 @@ class ProductsController extends Controller
             }
         }
 
+        //finds weather condition ID by name and returns products thats contains that ID
         $conditionId = WeatherCondition::where('name', $forecastAtExactHour['conditionCode'])->first();
         $products = Product::select('sku', 'name', 'price')->whereJsonContains('weather_conditions', $conditionId->id)->get();
+
 
         $returnData = [
             'city' => $data['place']['name'],
