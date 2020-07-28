@@ -1,0 +1,31 @@
+runtime: php
+env: flex
+
+runtime_config:
+    document_root: public
+
+skip_files:
+    - .env
+
+env_variables:
+    APP_ENV: production
+    APP_DEBUG : true
+    APP_KEY: base64:DeJTWEpXI0EsECH0oCEynHffewy1QzblRiiJiY4Hm/A=
+
+    CACHE_DRIVER: database
+    SESSION_DRIVER: database
+
+    APP_LOG: daily
+    APP_TIMEZONE: UTC
+
+    DB_CONNECTION: mysql
+    DB_HOST: localhost
+    DB_DATABASE: products_by_weather
+    DB_USERNAME: petka
+    DB_PASSWORD: rokas898
+    DB_SOCKET: "/cloudsql/letsgo-249009:europe-north1:adeoweather"
+
+    QUEUE_DRIVER: database
+
+beta_settings:
+    cloud_sql_instances: "letsgo-249009:europe-north1:adeoweather"
